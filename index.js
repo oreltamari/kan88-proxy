@@ -85,7 +85,7 @@ app.get('/callback', async (req, res) => {
       }
     );
     const { access_token } = response.data;
-res.redirect(`https://kan88-proxy-production.up.railway.app/?spotify_token=${access_token}`);    res.redirect(`/?spotify_token=${access_token}`);
+res.redirect(`https://kan88proxy.vercel.app/?spotify_token=${access_token}`);res.redirect(`https://kan88-proxy-production.up.railway.app/?spotify_token=${access_token}`);    res.redirect(`/?spotify_token=${access_token}`);
   } catch (e) {
     res.status(500).send('Spotify auth error: ' + e.message);
   }
