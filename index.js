@@ -65,7 +65,6 @@ app.get('/detect', async (req, res) => {
   }
 });
 
-// Spotify OAuth
 app.get('/spotify/login', (req, res) => {
   const scopes = 'playlist-modify-public playlist-modify-private';
   const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${SPOTIFY_CLIENT_ID}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
@@ -75,9 +74,15 @@ app.get('/spotify/login', (req, res) => {
 app.get('/callback', async (req, res) => {
   const code = req.query.code;
   try {
-    const response = await axios.post('https://accounts.spotify.com/api/token',
+    const response = await axios.post(
+      'https://accounts.spotify.com/api/token',
       new URLSearchParams({ grant_type: 'authorization_code', code, redirect_uri: REDIRECT_URI }),
-      { headers: { 'Authorization': 'Basic ' + Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64'), 'Content-Type': 'application/x-www-form-urlencoded' } }
+      {
+        headers: {
+          'Authorization': 'Basic ' + Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
     );
     const { access_token } = response.data;
     res.redirect(`/?spotify_token=${access_token}`);
@@ -93,13 +98,15 @@ app.post('/spotify/create-playlist', express.json(), async (req, res) => {
       headers: { Authorization: `Bearer ${token}` }
     });
     const userId = meRes.data.id;
-    const playlistRes = await axios.post(`https://api.spotify.com/v1/users/${userId}/playlists`,
+    const playlistRes = await axios.post(
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
       { name: name || 'כאן 88 – היסטוריה', public: true },
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
     const playlistId = playlistRes.data.id;
     const uris = trackIds.map(id => `spotify:track:${id}`);
-    await axios.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+    await axios.post(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
       { uris },
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
@@ -110,14 +117,3 @@ app.post('/spotify/create-playlist', express.json(), async (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000, () => console.log('Proxy running'));
-```
-
-שמור, צא, ואז:
-```
-cd ~/kan88-proxy
-cp kan88-proxy/index.js index.js
-git add index.js
-git commit -m "add spotify oauth"
-git push
-E-F
-E0F
