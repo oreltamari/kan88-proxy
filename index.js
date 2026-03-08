@@ -85,7 +85,7 @@ app.get('/callback', async (req, res) => {
       }
     );
     const { access_token } = response.data;
-res.redirect(`https://kan88proxy.vercel.app/?spotify_token=${access_token}`);res.redirect(`https://kan88-proxy-production.up.railway.app/?spotify_token=${access_token}`);    res.redirect(`/?spotify_token=${access_token}`);
+    res.redirect(`https://kan88proxy.vercel.app/?spotify_token=${access_token}`);
   } catch (e) {
     res.status(500).send('Spotify auth error: ' + e.message);
   }
@@ -116,5 +116,23 @@ app.post('/spotify/create-playlist', express.json(), async (req, res) => {
   }
 });
 
+app.get('/spotify/search', async (req, res) => {
+  const { token, title, artist } = req.query;
+  if (!token || !title) return res.status(400).json({ error: 'Missing token or title' });
+  try {
+    const q = encodeURIComponent(`track:${title} artist:${artist || ''}`);
+    const searchRes = await axios.get(`https://api.spotify.com/v1/search?q=${q}&type=track&limit=1`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const track = searchRes.data.tracks?.items?.[0];
+    if (track) {
+      res.json({ id: track.id, name: track.name, artist: track.artists?.[0]?.name });
+    } else {
+      res.json({ id: null });
+    }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.listen(process.env.PORT || 3000, () => console.log('Proxy running'));
-// Sun Mar  8 19:55:08 IST 2026
