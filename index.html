@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>כאן 88</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #222;
+      --accent: #c8a97e;
+      --text: #e8e0d4;
+      --muted: #666;
+      --red: #c0392b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Frank Ruhl Libre', serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .station-name {
+      font-size: 5rem;
+      font-weight: 300;
+      letter-spacing: -2px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .station-name span {
+      color: var(--accent);
+    }
+
+    .tagline {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+    }
+
+    .player-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .now-playing {
+      margin-bottom: 2rem;
+      min-height: 80px;
+    }
+
+    .now-playing-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .song-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.25rem;
+      color: var(--text);
+      transition: all 0.4s ease;
+    }
+
+    .song-artist {
+      font-size: 0.95rem;
+      color: var(--accent);
+      font-weight: 300;
+    }
+
+    .song-waiting {
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 300;
+      font-style: italic;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .play-btn {
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .play-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .play-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .volume-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .volume-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 1px;
+      background: var(--border);
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .detect-btn {
+      width: 100%;
+      padding: 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 1rem;
+    }
+
+    .detect-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .detect-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .detect-btn.detecting {
+      border-color: var(--accent);
+      color: var(--accent);
+      animation: detecting 1s infinite;
+    }
+
+    @keyframes detecting {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .history {
+      border: 1px solid var(--border);
+    }
+
+    .history-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .history-item:last-child { border-bottom: none; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .history-song { font-size: 0.9rem; }
+    .history-artist { font-size: 0.75rem; color: var(--accent); }
+    .history-time {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+    }
+
+    .empty-history {
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    .status-bar {
+      margin-top: 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-align: center;
+      min-height: 1rem;
+    }
+
+    .status-bar.error { color: var(--red); }
+    .status-bar.success { color: #27ae60; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="station-name">כאן <span>88</span></div>
+      <div class="tagline">רדיו המוזיקה של ישראל</div>
+    </div>
+
+    <div class="player-card">
+      <div class="now-playing">
+        <div class="now-playing-label">
+          <div class="live-dot" id="liveDot" style="opacity:0.3"></div>
+          <span>משודר עכשיו</span>
+        </div>
+        <div id="songTitle" class="song-waiting">לחץ זיהוי לגילוי השיר</div>
+        <div id="songArtist" class="song-artist"></div>
+      </div>
+
+      <div class="controls">
+        <button class="play-btn" id="playBtn" onclick="togglePlay()">
+          <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5,3 19,12 5,21"/>
+          </svg>
+        </button>
+        <div class="volume-wrap">
+          <span class="volume-label">VOL</span>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <button class="detect-btn" id="detectBtn" onclick="detectSong()">
+      זהה שיר עכשיו
+    </button>
+
+    <div class="history">
+      <div class="history-header">היסטוריית שירים</div>
+      <div class="history-list" id="historyList">
+        <div class="empty-history">אין שירים עדיין</div>
+      </div>
+    </div>
+
+    <div class="status-bar" id="statusBar"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+  <audio id="radioAudio" crossorigin="anonymous"></audio>
+
+  <script>
+    // ── הגדרות ACRCloud ──────────────────────────────────────────────
+    const ACR_HOST   = 'identify-ap-southeast-1.acrcloud.com';
+    const ACR_KEY    = '4c79fbfade6ec7d8422b4e500b930829';
+    const ACR_SECRET = 'Pjo7jijXPwp1K9QP1GMU41FqdrWNJH3rDAfoUYdH';
+
+    const HLS_URL = 'http://localhost:3000/stream/playlist.m3u8?bitrate=192000&audioId=1&lang=pol&renditions';
+
+    const audio = document.getElementById('radioAudio');
+    let isPlaying = false;
+    let hls = null;
+    const history = [];
+
+    function setStatus(msg, type = '') {
+      const el = document.getElementById('statusBar');
+      el.textContent = msg;
+      el.className = 'status-bar' + (type ? ' ' + type : '');
+    }
+
+    function tryStream() {
+      audio.volume = parseFloat(document.getElementById('volumeSlider').value);
+      setStatus('מתחבר לשידור…');
+
+      if (Hls.isSupported()) {
+        hls = new Hls({ enableWorker: false });
+        hls.loadSource(HLS_URL);
+        hls.attachMedia(audio);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          audio.play()
+            .then(() => {
+              setStatus('משודר בשידור חי', 'success');
+              document.getElementById('liveDot').style.opacity = '1';
+            })
+            .catch(() => setStatus('לא ניתן להפעיל. נסה שוב.', 'error'));
+        });
+        hls.on(Hls.Events.ERROR, (e, data) => {
+          if (data.fatal) setStatus('שגיאת חיבור לשידור.', 'error');
+        });
+      } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari תומך ב-HLS ישירות
+        audio.src = HLS_URL;
+        audio.play()
+          .then(() => {
+            setStatus('משודר בשידור חי', 'success');
+            document.getElementById('liveDot').style.opacity = '1';
+          })
+          .catch(() => setStatus('לא ניתן להפעיל.', 'error'));
+      } else {
+        setStatus('הדפדפן לא תומך בשידור זה.', 'error');
+      }
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        if (hls) { hls.destroy(); hls = null; }
+        audio.pause();
+        audio.src = '';
+        isPlaying = false;
+        document.getElementById('liveDot').style.opacity = '0.3';
+        setStatus('');
+      } else {
+        isPlaying = true;
+        tryStream();
+      }
+      updatePlayBtn();
+    }
+
+    function updatePlayBtn() {
+      const icon = document.getElementById('playIcon');
+      icon.innerHTML = isPlaying
+        ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
+        : '<polygon points="5,3 19,12 5,21"/>';
+    }
+
+    function setVolume(v) { audio.volume = parseFloat(v); }
+
+    // ── זיהוי שיר ────────────────────────────────────────────────────
+    async function detectSong() {
+      const btn = document.getElementById('detectBtn');
+      btn.disabled = true;
+      btn.classList.add('detecting');
+      btn.textContent = 'מקשיב…';
+      setStatus('מקליט דגימה…');
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        const chunks = [];
+
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = async () => {
+          stream.getTracks().forEach(t => t.stop());
+          const blob = new Blob(chunks, { type: 'audio/webm' });
+          setStatus('שולח לזיהוי…');
+          await identify(blob);
+          btn.disabled = false;
+          btn.classList.remove('detecting');
+          btn.textContent = 'זהה שיר עכשיו';
+        };
+
+        recorder.start();
+        setTimeout(() => recorder.stop(), 6000);
+      } catch (err) {
+        setStatus('לא ניתן לגשת למיקרופון. אשר הרשאה.', 'error');
+        btn.disabled = false;
+        btn.classList.remove('detecting');
+        btn.textContent = 'זהה שיר עכשיו';
+      }
+    }
+
+    async function identify(blob) {
+      try {
+        const timestamp  = Math.floor(Date.now() / 1000);
+        const dataType   = 'audio';
+        const sigVersion = '1';
+        const stringToSign = `POST\n/v1/identify\n${ACR_KEY}\n${dataType}\n${sigVersion}\n${timestamp}`;
+
+        // HMAC-SHA1 via WebCrypto
+        const enc = new TextEncoder();
+        const key = await crypto.subtle.importKey(
+          'raw', enc.encode(ACR_SECRET),
+          { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']
+        );
+        const sig = await crypto.subtle.sign('HMAC', key, enc.encode(stringToSign));
+        const signature = btoa(String.fromCharCode(...new Uint8Array(sig)));
+
+        const form = new FormData();
+        form.append('sample', blob, 'sample.webm');
+        form.append('access_key', ACR_KEY);
+        form.append('data_type', dataType);
+        form.append('signature_version', sigVersion);
+        form.append('signature', signature);
+        form.append('timestamp', timestamp);
+
+        const res  = await fetch(`https://${ACR_HOST}/v1/identify`, { method: 'POST', body: form });
+        const data = await res.json();
+
+        if (data.status?.code === 0 && data.metadata?.music?.length) {
+          const track  = data.metadata.music[0];
+          const title  = track.title;
+          const artist = track.artists?.map(a => a.name).join(', ') || '';
+          showSong(title, artist);
+        } else {
+          setStatus('לא זוהה שיר. נסה שוב.', 'error');
+        }
+      } catch (err) {
+        setStatus('שגיאה בזיהוי. בדוק חיבור.', 'error');
+      }
+    }
+
+    function showSong(title, artist) {
+      document.getElementById('songTitle').textContent = title;
+      document.getElementById('songTitle').className = 'song-title';
+      document.getElementById('songArtist').textContent = artist;
+      setStatus('זוהה בהצלחה', 'success');
+
+      const now = new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+      history.unshift({ title, artist, time: now });
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      if (!history.length) {
+        list.innerHTML = '<div class="empty-history">אין שירים עדיין</div>';
+        return;
+      }
+      list.innerHTML = history.map(item => `
+        <div class="history-item">
+          <div>
+            <div class="history-song">${item.title}</div>
+            <div class="history-artist">${item.artist}</div>
+          </div>
+          <div class="history-time">${item.time}</div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
