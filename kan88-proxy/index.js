@@ -94,12 +94,8 @@ app.get('/callback', async (req, res) => {
 app.post('/spotify/create-playlist', express.json(), async (req, res) => {
   const { token, trackIds, name } = req.body;
   try {
-    const meRes = await axios.get('https://api.spotify.com/v1/me', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const userId = meRes.data.id;
     const playlistRes = await axios.post(
-      `https://api.spotify.com/v1/users/${userId}/playlists`,
+      `https://api.spotify.com/v1/me/playlists`,
       { name: name || 'כאן 88 – היסטוריה', public: true },
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
