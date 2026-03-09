@@ -145,10 +145,13 @@ app.get('/spotify/search', async (req, res) => {
     const track = searchRes.data.tracks?.items?.[0];
     if (track) {
       res.json({ id: track.id, name: track.name, artist: track.artists?.[0]?.name });
-    } else {
+console.log('create-playlist called, token exists:', !!token);   
+ } else {
       res.json({ id: null });
     }
   } catch (e) {
+    console.error('create-playlist error:', e.response?.status, e.response?.data);console.error('create-playlist error:', e.response?.status, e.response?.data);console.error('create-playlist error:', e.response?.status, e.response?.data);
+
     res.status(500).json({ error: e.message });
   }
 });
