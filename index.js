@@ -85,7 +85,6 @@ app.get('/callback', async (req, res) => {
       }
     );
     const { access_token } = response.data;
-res.send(`<html><body><script>window.opener&&window.opener.postMessage({spotify_token:'${access_token}'},'*');window.close();</script></body></html>`);
     res.redirect(`https://kan88proxy.vercel.app/?spotify_token=${access_token}`);
   } catch (e) {
     res.status(500).send('Spotify auth error: ' + e.message);
