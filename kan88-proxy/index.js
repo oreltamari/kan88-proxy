@@ -111,7 +111,7 @@ app.post('/spotify/create-playlist', express.json(), async (req, res) => {
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
     res.json({ playlistUrl: playlistRes.data.external_urls.spotify });
-  } catch (e) {
+res.status(500).json({ error: e.message, details: e.response?.data });  } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
