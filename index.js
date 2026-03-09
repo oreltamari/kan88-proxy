@@ -93,22 +93,28 @@ app.get('/callback', async (req, res) => {
 
 app.post('/spotify/create-playlist', express.json(), async (req, res) => {
   const { token, trackIds, name } = req.body;
+  console.log('create-playlist called, trackIds:', JSON.stringify(trackIds));
   try {
+    console.log('step 1: creating playlist');
     const playlistRes = await axios.post(
       `https://api.spotify.com/v1/me/playlists`,
       { name: name || 'כאן 88 – היסטוריה', public: true },
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
+    console.log('step 2: playlist created', playlistRes.data.id);
     const playlistId = playlistRes.data.id;
     const uris = trackIds.map(id => `spotify:track:${id}`);
+    console.log('step 3: adding tracks', JSON.stringify(uris));
     await axios.post(
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
       { uris },
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
+    console.log('step 4: done');
     res.json({ playlistUrl: playlistRes.data.external_urls.spotify });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    console.error('create-playlist error:', e.response?.status, JSON.stringify(e.response?.data));
+    res.status(500).json({ error: e.message, details: e.response?.data });
   }
 });
 
@@ -145,13 +151,10 @@ app.get('/spotify/search', async (req, res) => {
     const track = searchRes.data.tracks?.items?.[0];
     if (track) {
       res.json({ id: track.id, name: track.name, artist: track.artists?.[0]?.name });
-console.log('create-playlist called, token exists:', !!token);   
- } else {
+    } else {
       res.json({ id: null });
     }
   } catch (e) {
-    console.error('create-playlist error:', e.response?.status, e.response?.data);console.error('create-playlist error:', e.response?.status, e.response?.data);console.error('create-playlist error:', e.response?.status, e.response?.data);
-
     res.status(500).json({ error: e.message });
   }
 });
